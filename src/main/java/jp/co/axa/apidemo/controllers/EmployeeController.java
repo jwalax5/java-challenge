@@ -1,8 +1,11 @@
 package jp.co.axa.apidemo.controllers;
 
 import jp.co.axa.apidemo.entities.Employee;
+import jp.co.axa.apidemo.response.ApiSuccessResponse;
 import jp.co.axa.apidemo.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,36 +19,49 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @GetMapping("/employees")
-    public List<Employee> getEmployees() {
+    public ResponseEntity<ApiSuccessResponse> getEmployees() {
+        final String message = "Employees Get Successfully";
         List<Employee> employees = employeeService.retrieveEmployees();
-        return employees;
+        ApiSuccessResponse<Employee> response = new ApiSuccessResponse(HttpStatus.OK, message, employees);
+        return new ResponseEntity<ApiSuccessResponse>(response, HttpStatus.OK);
     }
 
     @GetMapping("/employees/{employeeId}")
-    public Employee getEmployee(@PathVariable(name="employeeId")Long employeeId) {
-        return employeeService.getEmployee(employeeId);
+    public ResponseEntity<ApiSuccessResponse> getEmployee(@PathVariable(name = "employeeId") Long employeeId) {
+        final String message = String.format("Employee with id : %d Get Successfully", employeeId);
+        ApiSuccessResponse<Employee> response = new ApiSuccessResponse(HttpStatus.OK, message, employeeService.getEmployee(employeeId));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/employees")
-    public void saveEmployee(@Valid @RequestBody Employee employee){
+    public ResponseEntity<ApiSuccessResponse> saveEmployee(@Valid @RequestBody Employee employee) {
         employeeService.saveEmployee(employee);
-        System.out.println("Employee Saved Successfully");
+        final String message = String.format("Employee with id : %d Saved Successfully", employee.getId());
+        ApiSuccessResponse<Employee> response = new ApiSuccessResponse(HttpStatus.OK, message, employee);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/employees/{employeeId}")
-    public void deleteEmployee(@PathVariable(name="employeeId")Long employeeId){
-        employeeService.deleteEmployee(employeeId);
-        System.out.println("Employee Deleted Successfully");
+    public ResponseEntity<ApiSuccessResponse> deleteEmployee(@PathVariable(name = "employeeId") Long employeeId) {
+        final String message = String.format("Employee with id : %d Deleted Successfully", employeeId);
+        Employee emp = employeeService.getEmployee(employeeId);
+        if (emp != null) {
+            employeeService.deleteEmployee(employeeId);
+        }
+        ApiSuccessResponse<Employee> response = new ApiSuccessResponse(HttpStatus.OK, message, employeeId);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/employees/{employeeId}")
-    public void updateEmployee(@Valid @RequestBody Employee employee,
-                               @PathVariable(name="employeeId")Long employeeId){
+    public ResponseEntity<ApiSuccessResponse> updateEmployee(@Valid @RequestBody Employee employee, @PathVariable(name = "employeeId") Long employeeId) {
+        final String message = String.format("Employee with id : %d Updated Successfully", employeeId);
         Employee emp = employeeService.getEmployee(employeeId);
-        if(emp != null){
+        if (emp != null) {
             employeeService.updateEmployee(employee);
         }
-
+        employee.setId(employeeId);
+        ApiSuccessResponse<Employee> response = new ApiSuccessResponse(HttpStatus.OK, message, employee);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
