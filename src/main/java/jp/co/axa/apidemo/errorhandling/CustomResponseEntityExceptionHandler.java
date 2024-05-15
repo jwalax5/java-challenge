@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,6 +40,17 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         ApiErrorResponse error = new ApiErrorResponse(HttpStatus.NOT_FOUND, ex.getLocalizedMessage(), ex.getMessage());
         return new ResponseEntity<Object>(error, new HttpHeaders(), error.getStatus());
     }
+
+    // 415 Unsupported MediaType
+    @Override
+    public ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatus status,
+                                                                  WebRequest request){
+        ApiErrorResponse error = new ApiErrorResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE,  ex.getLocalizedMessage(),  ex.getMessage());
+        return new ResponseEntity<Object>(error, new HttpHeaders(), error.getStatus());
+    }
+
 
     // 500 INTERNAL ERROR
     @ExceptionHandler({RuntimeException.class, NullPointerException.class, IllegalArgumentException.class, IllegalStateException.class})
