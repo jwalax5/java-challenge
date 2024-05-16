@@ -3,8 +3,8 @@ package jp.co.axa.apidemo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jp.co.axa.apidemo.entities.Employee;
 import jp.co.axa.apidemo.repositories.EmployeeRepository;
+import org.junit.After;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,6 +14,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+
+import java.util.Base64;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
@@ -36,14 +38,14 @@ public class ApiDemoApplicationTests {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setup() {
+    @After
+    public void teardown() {
         employeeRepository.deleteAll();
     }
 
 
     @Test
-    public void givenEmployeeId_whenGetEmployee_thenReturnEmployee()
+    public void givenEmployeeId_whenGetEmployee_thenStatus200()
             throws Exception {
         // given - employee existed in database
         Employee employee = Employee.builder()
@@ -54,7 +56,8 @@ public class ApiDemoApplicationTests {
         employeeRepository.save(employee);
 
         // when - call api getEmployee
-        ResultActions response = mvc.perform(get("/api/v1/employees/{id}", employee.getId()));
+        ResultActions response = mvc.perform(get("/api/v1/employees/{id}", employee.getId())
+                .header("Authorization",getBasicAuthHeader("user","password")));
 
         // then - expect success with http status 200
         response.andDo(print()).andExpect(status().isOk())
@@ -64,7 +67,7 @@ public class ApiDemoApplicationTests {
     }
 
     @Test
-    public void givenEmployee_whenSaveEmployee_thenStatus200()
+    public void givenEmployee_whenSaveEmployee_thenStatus201()
             throws Exception {
         // given - setup of employee
         Employee employee = Employee.builder()
@@ -76,6 +79,7 @@ public class ApiDemoApplicationTests {
         // when - call api saveEmployee
         ResultActions response = mvc.perform(post("/api/v1/employees")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization",getBasicAuthHeader("user","password"))
                 .content(objectMapper.writeValueAsString(employee)));
 
         // then -  expect success with http status 201
@@ -83,6 +87,35 @@ public class ApiDemoApplicationTests {
                 .andExpect(jsonPath("$.['result'].name", is(employee.getName())))
                 .andExpect(jsonPath("$.['result'].salary", is(employee.getSalary())))
                 .andExpect(jsonPath("$.['result'].department", is(employee.getDepartment())));
+    }
+
+    @Test
+    public void givenNoAuthHeader_whenGetEmployee_thenStatus401()
+            throws Exception {
+
+        // given - no authorization header
+
+        // when - call api getEmployee without authorization header
+        ResultActions response = mvc.perform(get("/api/v1/employees/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then - expect error with http status 401
+        response.andDo(print()).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void givenIncorrectUsername_whenGetEmployee_thenStatus401()
+            throws Exception {
+
+        // given - incorrect username
+
+        // when - call api getEmployee with bad credential
+        ResultActions response = mvc.perform(get("/api/v1/employees/{id}", 1L)
+                .header("Authorization",getBasicAuthHeader("incorrectuser","password"))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then - expect error with http status 401
+        response.andDo(print()).andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -98,6 +131,7 @@ public class ApiDemoApplicationTests {
         // when - call api saveEmployee
         ResultActions response = mvc.perform(post("/api/v1/employees")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization",getBasicAuthHeader("user","password"))
                 .content(objectMapper.writeValueAsString(invalidEmployee)));
 
         // then -  expect error with http status 400
@@ -120,6 +154,7 @@ public class ApiDemoApplicationTests {
         // when - call api saveEmployee with not support content type
         ResultActions response = mvc.perform(post("/api/v1/employees")
                 .contentType(MediaType.APPLICATION_XML)
+                .header("Authorization",getBasicAuthHeader("user","password"))
                 .content(objectMapper.writeValueAsString(employee)));
 
         // then -  expect error with http status 415
@@ -148,6 +183,7 @@ public class ApiDemoApplicationTests {
         // when - call api updateEmployee
         ResultActions response = mvc.perform(put("/api/v1/employees/{id}", employee.getId())
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization",getBasicAuthHeader("user","password"))
                 .content(objectMapper.writeValueAsString(updatedEmployee)));
 
         // then -  expect success with http status 200
@@ -173,6 +209,7 @@ public class ApiDemoApplicationTests {
         // when - call api updateEmployee
         ResultActions response = mvc.perform(put("/api/v1/employees/{id}", nonExistId)
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization",getBasicAuthHeader("user","password"))
                 .content(objectMapper.writeValueAsString(updatedEmployee)));
 
         // then - expect error with http status 404
@@ -182,8 +219,13 @@ public class ApiDemoApplicationTests {
     }
 
 
+
+
     // todo
     // integration test of deleteEmployee
-
+    private String getBasicAuthHeader(String username, String password){
+        String usernameAndPassword = username + ":" + password;
+        return "Basic " + Base64.getEncoder().encodeToString(usernameAndPassword.getBytes());
+    }
 
 }
