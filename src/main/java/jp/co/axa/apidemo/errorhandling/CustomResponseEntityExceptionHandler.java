@@ -53,8 +53,8 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 
     // 500 INTERNAL ERROR
-    @ExceptionHandler({RuntimeException.class, NullPointerException.class, IllegalArgumentException.class, IllegalStateException.class})
-    public ResponseEntity<Object> handleInternal(final RuntimeException ex, final WebRequest request) {
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleExceptionInternal(final RuntimeException ex, final WebRequest request) {
         ApiErrorResponse error = new ApiErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), ex.getMessage());
         return new ResponseEntity<Object>(error, new HttpHeaders(), error.getStatus());
     }

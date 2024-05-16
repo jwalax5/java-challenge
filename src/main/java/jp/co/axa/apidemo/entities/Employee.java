@@ -1,7 +1,6 @@
 package jp.co.axa.apidemo.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +13,9 @@ import javax.validation.constraints.*;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "EMPLOYEE")
 public class Employee {
 
@@ -31,7 +33,7 @@ public class Employee {
     @Min(value = 0, message = "please input valid salary")
     private Integer salary;
 
-    @NotEmpty(message = "please input department")
+    @NotBlank(message = "please input department")
     @Column(name = "DEPARTMENT")
     private String department;
 
