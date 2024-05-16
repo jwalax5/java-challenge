@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.*;
+import java.io.Serializable;
 
 @Entity
 @Getter
@@ -17,7 +18,8 @@ import javax.validation.constraints.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "EMPLOYEE")
-public class Employee {
+public class Employee implements Serializable {
+    private static final long serialVersionUID = 1446398935944895849L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

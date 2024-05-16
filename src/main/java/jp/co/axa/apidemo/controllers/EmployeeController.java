@@ -4,9 +4,12 @@ import jp.co.axa.apidemo.entities.Employee;
 import jp.co.axa.apidemo.response.ApiSuccessResponse;
 import jp.co.axa.apidemo.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,6 +31,8 @@ public class EmployeeController {
     }
 
     @GetMapping(value = "/employees/{employeeId}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Transactional(readOnly = true)
+    @Cacheable("employee-cache")
     public ResponseEntity<ApiSuccessResponse> getEmployee(@PathVariable(name = "employeeId") Long employeeId) {
         final String message = String.format("Employee with id : %d Get Successfully", employeeId);
         Employee employee = employeeService.getEmployee(employeeId);
@@ -44,6 +49,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping(value = "/employees/{employeeId}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @CacheEvict("employee-cache")
     public ResponseEntity<ApiSuccessResponse> deleteEmployee(@PathVariable(name = "employeeId") Long employeeId) {
         final String message = String.format("Employee with id : %d Deleted Successfully", employeeId);
         Employee emp = employeeService.getEmployee(employeeId);
