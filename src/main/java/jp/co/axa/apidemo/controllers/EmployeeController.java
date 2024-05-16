@@ -58,6 +58,7 @@ public class EmployeeController {
             @ApiResponse(code = 201, message = "Employee is created", response = ApiSuccessResponse.class),
             @ApiResponse(code = 400, message = "Invalid parameter(s)" ,response = ApiErrorResponse.class),
             @ApiResponse(code = 401, message = "Unauthorized" ,response = ApiErrorResponse.class),
+            @ApiResponse(code = 415, message = "Unsupported content-type" ,response = ApiErrorResponse.class),
             @ApiResponse(code = 500, message = "Internal server error" ,response = ApiErrorResponse.class)
     })
     @ResponseStatus(value = HttpStatus.CREATED)
@@ -94,6 +95,7 @@ public class EmployeeController {
             @ApiResponse(code = 400, message = "Invalid parameter(s)" ,response = ApiErrorResponse.class),
             @ApiResponse(code = 401, message = "Unauthorized" ,response = ApiErrorResponse.class),
             @ApiResponse(code = 404, message = "Employee not found" ,response = ApiErrorResponse.class),
+            @ApiResponse(code = 415, message = "Unsupported content-type" ,response = ApiErrorResponse.class),
             @ApiResponse(code = 500, message = "Internal server error" ,response = ApiErrorResponse.class)
     })
     @PutMapping(value = "/employees/{employeeId}", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
