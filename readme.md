@@ -1,52 +1,22 @@
-### How to use this spring-boot project
+#### My experience in Java
+- I have 6 years experience in Java 
+- I have 2 years experience on Spring , which was very long time ago , a spring project with xml configuration
+- I have 2 years experience on Spring Boot for 2 different project
 
-- Install packages with `mvn package`
-- Run `mvn spring-boot:run` for starting the application (or use your IDE)
+#### What I did
+- add unit test & integration test
+- improve swagger doc
+- add caching for getEmployee api
+- add basic authentication for api (username: user , password: password)
+  - if using curl, add header 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
+- add custom api response
+- add validation for field of Employee entity
+- removal of setter injection
+- fix bug of get value from optional without checking isPresent
 
-Application (with the embedded H2 database) is ready to be used ! You can access the url below for testing it :
-
-- Swagger UI : http://localhost:8080/swagger-ui.html
-- H2 UI : http://localhost:8080/h2-console
-
-> Don't forget to set the `JDBC URL` value as `jdbc:h2:mem:testdb` for H2 UI.
-
-
-
-### Instructions
-
-- download the zip file of this project
-- create a repository in your own github named 'java-challenge'
-- clone your repository in a folder on your machine
-- extract the zip file in this folder
-- commit and push
-
-- Enhance the code in any ways you can see, you are free! Some possibilities:
-  - Add tests
-  - Change syntax
-  - Protect controller end points
-  - Add caching logic for database calls
-  - Improve doc and comments
-  - Fix any bug you might find
-- Edit readme.md and add any comments. It can be about what you did, what you would have done if you had more time, etc.
-- Send us the link of your repository.
-
-#### Restrictions
-- use java 8
-
-
-#### What we will look for
-- Readability of your code
-- Documentation
-- Comments in your code 
-- Appropriate usage of spring boot
-- Appropriate usage of packages
-- Is the application running as expected
-- No performance issues
-
-#### Your experience in Java
-
-Please let us know more about your Java experience in a few sentences. For example:
-
-- I have 3 years experience in Java and I started to use Spring Boot from last year
-- I'm a beginner and just recently learned Spring Boot
-- I know Spring Boot very well and have been using it for many years
+#### What would have done if got more time
+- increase test case coverage
+- try to catch all exception into custom api error response
+- add logging
+- move string message to external config file and can support localization 
+- implement JWT authentication
